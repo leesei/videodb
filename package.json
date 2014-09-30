@@ -19,6 +19,6 @@
   "dependencies": {
     "exec-sync": "^0.1.6",
     "lodash": "^2.4.1",
-    "nomnom": "^1.7.0"
+    "nomnom": "^1.8.0"
   }
 }

@@ -52,7 +52,6 @@ function writeJson(json, outfile) {
   return false;
 }
 
-
 module.exports = {
   loadJson: loadJson,
   getVideoSource: getVideoSource,

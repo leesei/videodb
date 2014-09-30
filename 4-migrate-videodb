@@ -6,6 +6,7 @@ var _ = require('lodash');
 var execSync = require("exec-sync");
 var fs = require('fs');
 var util = require('./util');
+var chalk = require('nomnom/node_modules/chalk');
 
 var opts = require("nomnom")
   .script("migrate-videodb")
@@ -19,9 +20,9 @@ var opts = require("nomnom")
       help: "dbjson to migrate to",
       required: true
   })
-  .help("Author: ".bold +
-    "leesei@gmail.com".underline + "       "+
-    "Licence: ".bold + "MIT\n")
+  .help(chalk.bold("Author: ") +
+    chalk.underline("leesei@gmail.com") + "       "+
+    chalk.bold("Licence: ") + "MIT\n")
   .parse();
 
 // console.log(opts);
