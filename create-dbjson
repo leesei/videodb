@@ -1,1 +1,93 @@
-3-create-dbjson
+#!/usr/bin/env node
+
+// this script creates a dbjson from infojson(s)
+
+var _ = require('lodash');
+var fs = require('fs');
+var util = require('./util');
+var chalk = require('nomnom/node_modules/chalk');
+
+var opts = require("nomnom")
+  .script("create-dbjson")
+  .option('infojson', {
+       position: 0,
+       help: "info.json to parse",
+       list: true,
+       required: true
+  })
+  .option('output', {
+       abbr: 'o',
+       help: "output file (append if exist)",
+       default: "video.db.json"
+  })
+  .option('tags', {
+       abbr: 't',
+       help: "tags to add to dbjson",
+       list: true,
+       default: []
+  })
+  .option('use-infojson-name', {
+       abbr: 'i',
+       help: "use infojson name as default, overrides '-o' (applicable for single file only)",
+       flag: true,
+       default: false
+  })
+  .help(chalk.bold("Author: ") +
+    chalk.underline("leesei@gmail.com") + "       "+
+    chalk.bold("Licence: ") + "MIT\n")
+  .parse();
+
+// console.log(opts);
+
+if (opts['use-infojson-name']) {
+  if (opts.infojson.length === 1) {
+    opts.output = opts.infojson[0].replace(/info.json$/, 'db.json');
+  }
+  else {
+    console.error('more than one file, not using infojson name');
+  }
+  // console.log(opts.output);
+  // return;
+}
+
+var videodb = [];
+if (fs.existsSync(opts.output)) {
+  console.error('out file exists:', opts.output);
+  return;
+
+  // append mode would require a look up of entry and merge tags
+  // videodb = loadJson(opts.output);
+  // if (!_.isArray(videodb)) {
+  //   console.error('invalid out file:', opts.output);
+  // }
+}
+
+_.forEach(opts.infojson, function (f) {
+  if (f.indexOf('.info.json') == -1) {
+    console.error('not .info.json:', f);
+    return;
+  }
+
+  var infojson = util.loadJson(f);
+  if (!infojson.webpage_url) {
+    console.error('old infojson:', f);
+    return;
+  }
+  var tags = _.union(opts.tags, infojson.tags);
+  videodb.push({
+    video_id: infojson.id,
+    title: infojson.title,
+    extractor: infojson.extractor,
+    duration: infojson.duration,
+    url: infojson.webpage_url,
+    uploader: infojson.uploader_id,
+    upload_date: infojson.upload_date,
+    thumbnail: infojson.thumbnail,
+    tags: tags,
+    rating: infojson.rating
+  });
+});
+
+if (util.writeJson(videodb, opts.output)){
+  console.info('writing to ' + opts.output);
+}

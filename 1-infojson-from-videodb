@@ -1,48 +1,52 @@
 #!/usr/bin/env node
 
 // this script downloads infojson for clips in old videodb
-// requires youtube-dl.py from http://youtube-dl.org/
+// requires yt-dlp
 
-var _ = require('lodash');
-var util = require('./util');
-var chalk = require('nomnom/node_modules/chalk');
+var _ = require("lodash");
+var util = require("./util");
+var chalk = require("nomnom/node_modules/chalk");
 
 var opts = require("nomnom")
   .script("infojson-from-videodb")
-  .option('videodb', {
-       position: 0,
-       help: "videodb to parse",
-       list: false,
-       required: true
+  .option("videodb", {
+    position: 0,
+    help: "videodb to parse",
+    list: false,
+    required: true,
   })
-  .help(chalk.bold("Author: ") +
-    chalk.underline("leesei@gmail.com") + "       "+
-    chalk.bold("Licence: ") + "MIT\n")
+  .help(
+    chalk.bold("Author: ") +
+      chalk.underline("leesei@gmail.com") +
+      "       " +
+      chalk.bold("Licence: ") +
+      "MIT\n",
+  )
   .parse();
 
 // console.log(opts);
 
 var failedEntries = {};
-_.forOwn(util.loadJson(opts.videodb), function(val, key) {
+_.forOwn(util.loadJson(opts.videodb), function (val, key) {
   // console.log(key);
   var source = util.getVideoSource(key);
   var url = util.sourceToUrl(source);
 
-  if (!url){
-    console.error('unknown source', key);
+  if (!url) {
+    console.error("unknown source", key);
     failedEntries[key] = val;
     return;
   }
 
-  console.log('downloading info.json: ' + url);
+  console.log("downloading info.json: " + url);
   if (!util.downloadInfoJson(url)) {
-    console.error('error downloading', key);
+    console.error("error downloading", key);
     failedEntries[key] = val;
     return;
   }
 });
 
-var failOutfile = '1-failedEntries.json';
+var failOutfile = "1-failedEntries.json";
 if (util.writeJson(failedEntries, failOutfile)) {
-  console.error('failed on some entries, see ' + failOutfile);
+  console.error("failed on some entries, see " + failOutfile);
 }

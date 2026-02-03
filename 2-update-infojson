@@ -1,23 +1,27 @@
 #!/usr/bin/env node
 
 // this script updates existing infojson
-// requires youtube-dl.py from http://youtube-dl.org/
+// requires yt-dlp
 
-var _ = require('lodash');
-var util = require('./util');
-var chalk = require('nomnom/node_modules/chalk');
+var _ = require("lodash");
+var util = require("./util");
+var chalk = require("nomnom/node_modules/chalk");
 
 var opts = require("nomnom")
   .script("update-infojson")
-  .option('infojson', {
-       position: 0,
-       help: "info.json(s) to update",
-       list: true,
-       required: true
+  .option("infojson", {
+    position: 0,
+    help: "info.json(s) to update",
+    list: true,
+    required: true,
   })
-  .help(chalk.bold("Author: ") +
-    chalk.underline("leesei@gmail.com") + "       "+
-    chalk.bold("Licence: ") + "MIT\n")
+  .help(
+    chalk.bold("Author: ") +
+      chalk.underline("leesei@gmail.com") +
+      "       " +
+      chalk.bold("Licence: ") +
+      "MIT\n",
+  )
   .parse();
 
 // console.log(opts);
@@ -28,24 +32,24 @@ _.forEach(opts.infojson, function (f) {
   var infojson = util.loadJson(f);
   var source = {
     extractor: infojson.extractor,
-    video_id: infojson.id
+    video_id: infojson.id,
   };
   var url = util.sourceToUrl(source);
 
-  if (!url){
-    console.error('error parsing', f);
+  if (!url) {
+    console.error("error parsing", f);
     return;
   }
 
-  console.log('downloading info.json: ' + url);
+  console.log("downloading info.json: " + url);
   if (!util.downloadInfoJson(url)) {
-    console.error('error downloading', url);
+    console.error("error downloading", url);
     failedEntries.push(url);
     return;
   }
 });
 
-var failOutfile = '2-failedEntries.json';
+var failOutfile = "2-failedEntries.json";
 if (util.writeJson(failedEntries, failOutfile)) {
-  console.error('failed on some entries, see ' + failOutfile);
+  console.error("failed on some entries, see " + failOutfile);
 }
